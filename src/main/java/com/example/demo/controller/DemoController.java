@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 public class DemoController {
 
-    private final DemoService demoService;
     private final DemoServiceV2 demoServiceV2;
 
-    public DemoController(DemoService demoService,
-                          DemoServiceV2 demoServiceV2) {
-        this.demoService = demoService;
+    public DemoController(DemoServiceV2 demoServiceV2) {
         this.demoServiceV2 = demoServiceV2;
     }
 
@@ -35,10 +34,18 @@ public class DemoController {
             @Parameter(name = "outputFilePath",
                     description = "The path of the merged output file",
                     schema = @Schema(example = "C:\\Users\\hp\\Desktop\\master.csv"))
-            @RequestParam final String outputFilePath) throws Exception {
+            @RequestParam final String outputFilePath,
+            @Parameter(name = "additionalHeaders",
+                    description = "List of additional headers to be written in the output file",
+                    schema = @Schema(example = "loan number, insurer, policy number"))
+            @RequestParam(required = false) final String additionalHeaders) throws Exception {
         System.out.println("filesFolderPath: " + filesFolderPath);
         System.out.println("outputFilePath: " + outputFilePath);
-        final File file = demoServiceV2.mergeFiles(filesFolderPath, outputFilePath);
+        System.out.println("additionalHeaders: " + additionalHeaders);
+
+        final File file = demoServiceV2.mergeFiles(filesFolderPath,
+                outputFilePath,
+                additionalHeaders == null ? Collections.emptyList() : List.of(additionalHeaders.split(",")));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
