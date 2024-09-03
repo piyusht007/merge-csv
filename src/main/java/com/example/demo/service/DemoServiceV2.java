@@ -52,7 +52,7 @@ public class DemoServiceV2 {
                 System.out.println("Reading file: " + file);
                 totalRowsWritten += processFile(file, writer, additionalHeaders);
 
-                if (totalRowsWritten >= 100000) {
+                if (totalRowsWritten >= 1_000_000) {
                     writer.close(); // Close current writer
                     String outputFilePath1 = outputFilePath.replaceFirst("(\\.[^.]*)?$", "_" + fileCounter + "$1");
                     uniqueOutputPath = getUniqueFilePath(outputFilePath1);
