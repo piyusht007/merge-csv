@@ -10,7 +10,7 @@ public class Constants {
     static final List<String> REGISTRATION_NUMBER_VARIANTS = Arrays.asList("registration numbers", "registration number", "reg no", "reg num", "reg", "registration");
     static final List<String> CHASSIS_NUMBER_VARIANTS = Arrays.asList("chasis number", "chasis no", "chassis number", "chassis", "chass no", "chass", "chassis no");
     static final List<String> POSITION_VARIANTS = Arrays.asList("positions", "position", "pos", "po");
-    static final List<String> MANDATORY_COLUMNS = new ArrayList<>(Arrays.asList("customer name", "engine number", "registration number", "chassis number", "position"));
+    static final List<String> MANDATORY_COLUMNS = new ArrayList<>(Arrays.asList( "registration number", "customer name", "engine number", "chassis number", "position"));
     static final int NUM_FIXED_HEADERS = MANDATORY_COLUMNS.size();
 
     static final List<String[]> APPROVERS = Arrays.asList(

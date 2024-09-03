@@ -1,14 +1,28 @@
 package com.example.demo.service;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +33,10 @@ public class DemoServiceV2 {
                            String outputFilePath,
                            List<String> additionalHeaders) {
         final Instant start = Instant.now();
-        final Path uniqueOutputPath = getUniqueFilePath(outputFilePath);
+        Path uniqueOutputPath = getUniqueFilePath(outputFilePath);
+        int fileCounter = 1;
+        int totalRowsWritten = 0;
+        BufferedWriter writer = null;
 
         try (final Stream<Path> paths = Files.walk(Paths.get(filesFolderPath))) {
             final Set<String> filesToMerge = paths
@@ -28,18 +45,38 @@ public class DemoServiceV2 {
                     .filter(string -> string.endsWith(".xlsx"))
                     .collect(Collectors.toSet());
 
-            try (BufferedWriter writer = Files.newBufferedWriter(uniqueOutputPath, StandardOpenOption.CREATE)) {
-                writeHeaders(writer, additionalHeaders);
+            writer = Files.newBufferedWriter(uniqueOutputPath, StandardOpenOption.CREATE);
+            writeHeaders(writer, additionalHeaders);
 
-                for (String file : filesToMerge) {
-                    System.out.println("Reading file: " + file);
-                    processFile(file, writer, additionalHeaders);
+            for (String file : filesToMerge) {
+                System.out.println("Reading file: " + file);
+                totalRowsWritten += processFile(file, writer, additionalHeaders);
+
+                if (totalRowsWritten >= 100000) {
+                    writer.close(); // Close current writer
+                    String outputFilePath1 = outputFilePath.replaceFirst("(\\.[^.]*)?$", "_" + fileCounter + "$1");
+                    uniqueOutputPath = getUniqueFilePath(outputFilePath1);
+
+                    writer = Files.newBufferedWriter(uniqueOutputPath, StandardOpenOption.CREATE);
+                    writeHeaders(writer, additionalHeaders);
+                    fileCounter++;
+                    totalRowsWritten = 0;
                 }
             }
+
             System.out.println("Merged file created at: " + uniqueOutputPath);
         } catch (IOException e) {
             System.out.println("Exception while merging files...");
             e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    System.out.println("Exception while closing the writer...");
+                    e.printStackTrace();
+                }
+            }
         }
 
         final Instant end = Instant.now();
@@ -69,7 +106,9 @@ public class DemoServiceV2 {
         writer.write(finalHeaders);
     }
 
-    private void processFile(String filePath, BufferedWriter writer, List<String> additionalHeaders) {
+    private int processFile(String filePath, BufferedWriter writer, List<String> additionalHeaders) {
+        int rowsWritten = 0;
+
         try (final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filePath));
              final XSSFWorkbook wb = new XSSFWorkbook(bis)) {
             final XSSFSheet sheet = wb.getSheetAt(0);
@@ -91,11 +130,14 @@ public class DemoServiceV2 {
 
                 addApprovers(line);
                 writer.write(String.join(",", line) + "\n");
+                rowsWritten++;
             }
         } catch (IOException e) {
             System.out.println("Exception while processing file: " + filePath);
             e.printStackTrace();
         }
+
+        return rowsWritten;
     }
 
     private void populateLine(Row row, Map<String, Integer> columnMap, List<String> line, List<String> additionalHeaders) {
