@@ -37,6 +37,6 @@ jobs:
     - name: Publish to GitHub Packages Apache Maven
       run: | 
         mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-        mvn deploy:deploy-file -Durl=https://maven.pkg.github.com/${{ github.repository }} -DrepositoryId=github -Dfile=target/*.jar -DgroupId=com.example -DartifactId=merged-package -Dversion=1.0.0
+        mvn deploy:deploy-file -Durl=https://maven.pkg.github.com/${{ github.repository }} -DrepositoryId=github -Dfile=target/merged-package.zip -DgroupId=com.example -DartifactId=merged-package -Dversion=1.0.0
       env:
         GITHUB_TOKEN: ${{ github.token }}
