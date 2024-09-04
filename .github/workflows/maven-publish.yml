@@ -35,6 +35,8 @@ jobs:
       run: zip -j target/merged-package.zip target/*.jar merge.bat
 
     - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+      run: | 
+        mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        mvn deploy:deploy-file -Durl=https://maven.pkg.github.com/${{ github.repository }} -DrepositoryId=github -Dfile=target/*.jar -DgroupId=com.example -DartifactId=merged-package -Dversion=1.0.0
       env:
         GITHUB_TOKEN: ${{ github.token }}
