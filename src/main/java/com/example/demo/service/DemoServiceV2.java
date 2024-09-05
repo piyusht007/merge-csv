@@ -98,7 +98,7 @@ public class DemoServiceV2 {
     }
 
     private void writeHeaders(BufferedWriter writer, List<String> additionalHeaders) throws IOException {
-        String headers = "REGISTRATION NUMBER,CUSTOMER NAME,ENGINE NUMBER,CHASSIS NUMBER,POSITION,";
+        String headers = Constants.MANDATORY_COLUMNS.stream().map(String::toUpperCase).collect(Collectors.joining(",")) + ",";
         String approverHeaders = "APPROVER 1 NAME,APPROVER 1 CONTACT,APPROVER 2 NAME,APPROVER 2 CONTACT,APPROVER 3 NAME,APPROVER 3 CONTACT\n";
         String finalHeaders = additionalHeaders.isEmpty()
                 ? headers + approverHeaders
