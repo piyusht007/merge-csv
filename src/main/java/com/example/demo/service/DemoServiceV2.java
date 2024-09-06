@@ -53,6 +53,7 @@ public class DemoServiceV2 {
                 totalRowsWritten += processFile(file, writer, additionalHeaders);
 
                 if (totalRowsWritten >= 1_000_000) {
+                    System.out.println("Writing to new file as total rows written for the current file is: " + totalRowsWritten);
                     writer.close(); // Close current writer
                     String outputFilePath1 = outputFilePath.replaceFirst("(\\.[^.]*)?$", "_" + fileCounter + "$1");
                     uniqueOutputPath = getUniqueFilePath(outputFilePath1);
@@ -64,6 +65,7 @@ public class DemoServiceV2 {
                 }
             }
 
+            System.out.println("Total rows written: " + totalRowsWritten);
             System.out.println("Merged file created at: " + uniqueOutputPath);
         } catch (IOException e) {
             System.out.println("Exception while merging files...");
@@ -166,7 +168,7 @@ public class DemoServiceV2 {
     }
 
     private void addToCell(List<String> line, Cell cell, Integer sheetIdx, Integer writeIdx) {
-        if (sheetIdx != null && cell.getColumnIndex() == sheetIdx) {
+        if (sheetIdx != null && cell != null && cell.getColumnIndex() == sheetIdx) {
             final CellType cellType = cell.getCellType();
 
             switch (cellType) {
