@@ -8,7 +8,7 @@ for %%f in (demo-*.jar) do set "JAR_FILE=%%f"
 rem Check if the JAR file was found
 if defined JAR_FILE (
     echo Running !JAR_FILE!...
-    start "" cmd /c "title Merge Process & java -Xms1g -Xmx1g -jar !JAR_FILE!"
+    start "" cmd /k "title Merge Process & java -Xms1g -Xmx1g -jar !JAR_FILE!"
 
     rem Wait for a specified amount of time (e.g., 5 seconds)
     echo Waiting for 5 seconds before opening Chrome...
