@@ -210,6 +210,9 @@ public class DemoServiceV2 {
         columnMap.put("registration number", findExactMatch(headerMap, Constants.REGISTRATION_NUMBER_VARIANTS));
         columnMap.put("chassis number", findExactMatch(headerMap, Constants.CHASSIS_NUMBER_VARIANTS));
         columnMap.put("position", findExactMatch(headerMap, Constants.POSITION_VARIANTS));
+        columnMap.put("loan number", findExactMatch(headerMap, Constants.LOAN_VARIANTS));
+        columnMap.put("model", findExactMatch(headerMap, Constants.MODEL_VARIANTS));
+        columnMap.put("make", findExactMatch(headerMap, Constants.MAKE_VARIANTS));
 
         if (!additionalHeaders.isEmpty()) {
             for (String header : additionalHeaders) {
