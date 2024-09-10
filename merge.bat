@@ -2,12 +2,13 @@
 setlocal enabledelayedexpansion
 
 rem Find the JAR file that matches the pattern
+set "JAR_FILE="
 for %%f in (demo-*.jar) do set "JAR_FILE=%%f"
 
 rem Check if the JAR file was found
 if defined JAR_FILE (
-    echo Running %JAR_FILE%...
-    start "" cmd /c "title Merge Process & java -Xms1g -Xmx1g -jar "%JAR_FILE%""
+    echo Running !JAR_FILE!...
+    start "" cmd /c "title Merge Process & java -Xms1g -Xmx1g -jar !JAR_FILE!"
 
     rem Wait for a specified amount of time (e.g., 5 seconds)
     echo Waiting for 5 seconds before opening Chrome...
@@ -24,22 +25,29 @@ if defined JAR_FILE (
             rem Remove the first and last character
             set "x=%%d"
             set "CHROME_PATH=!x:~1,-1!"
-            echo Debug: CHROME_PATH=!CHROME_PATH!
+            echo Debug: Found Chrome Path !CHROME_PATH!
             goto :foundChrome
         )
+        echo Debug: Path not found: %%d
     )
 
-    :foundChrome
-    echo Debug: CHROME_PATH="%CHROME_PATH%"
-    if defined CHROME_PATH (
-        echo Chrome executable found at: "%CHROME_PATH%"
-        echo Opening Chrome and navigating to the URL...
-        start "" "%CHROME_PATH%" "http://localhost:8080/swagger-ui.html"
-    ) else (
-        echo Chrome executable not found.
-    )
+    rem If no Chrome path is found
+    echo Chrome executable not found.
+    goto :end
 ) else (
     echo No JAR file found matching the pattern.
+    goto :end
 )
 
+:foundChrome
+echo Debug: Final CHROME_PATH=!CHROME_PATH!
+if defined CHROME_PATH (
+    echo Chrome executable found at: !CHROME_PATH!
+    echo Opening Chrome and navigating to the URL...
+    start "" "!CHROME_PATH!" "http://localhost:8080/swagger-ui.html"
+) else (
+    echo Chrome executable not found.
+)
+
+:end
 pause
